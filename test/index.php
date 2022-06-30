@@ -1,9 +1,16 @@
 <?php
 
+    include "../carbon/kernel/overlays/constant.php";
+    include "../carbon/kernel/loaders/Autoloader.php";
+
+    use carbon\kernel\loaders\Autoloader;
+    Autoloader::register();
+
     /**
      * use the testing class extended of UnitTest
      * and construct them in html main
     */
+    use test\carbon_test\autoloader\AutoloaderTest;
 
 ?>
 
@@ -28,6 +35,8 @@
 
             <?php
             
+                new AutoloaderTest();
+
             ?>
 
         </main>
