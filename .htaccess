@@ -1,0 +1,18 @@
+Options +FollowSymLinks
+RewriteEngine On
+RewriteBase /
+
+# if public folder root redirect to index
+RewriteCond %{REQUEST_URI} ^/public/$
+RewriteRule ^ %1 [L,R]
+
+# if file not exist redirect to index
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ %1 [L,R]
+
+# else if in public folder allow acces to public
+RewriteRule ^/?public/ - [L]
+
+# else redirect to index
+RewriteRule ^(.*)$ public/index.php
