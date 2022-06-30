@@ -1,3 +1,7 @@
+V0.0.2 - Add unit test to project
+    - add unit test class to check if code work properly
+    - add html and css to check tests results
+
 V0.0.1 - Configure project folder
     - redirect url 
     - access public folder

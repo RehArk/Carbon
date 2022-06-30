@@ -13,6 +13,8 @@ RewriteRule ^ %1 [L,R]
 
 # else if in public folder allow acces to public
 RewriteRule ^/?public/ - [L]
+# else if in public folder allow acces to test
+RewriteRule ^/?test/ - [L]
 
 # else redirect to index
 RewriteRule ^(.*)$ public/index.php

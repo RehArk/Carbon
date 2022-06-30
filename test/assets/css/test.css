@@ -1,0 +1,20 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+h2, p {
+    color: white;
+}
+
+main {
+    margin: 50px 5%;
+}
+
+.carbon_test {
+    background-color: rgb(39, 39, 39);
+}
+
+.test-class {
+    margin: 15px 0 5px 0;
+}
