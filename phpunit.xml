@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit
+    cacheDirectory=".phpunit.result.cache"
+>
+    <testsuites>
+        <testsuite name="default">
+            <directory>test</directory>
+        </testsuite>
+    </testsuites>
+
+    <source restrictDeprecations="true" restrictNotices="true" restrictWarnings="true">
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+
+</phpunit>
