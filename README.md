@@ -6,5 +6,5 @@ Carbon is a small PHP framework, light as fiber, strong as carbon.
 To test the framework, you could use this following command :
 
 ```bash
-php -d xdebug.mode=coverage ./vendor/bin/phpunit  --coverage-html .phpunit.result.cache/html-code-coverage
+php -d xdebug.mode=coverage ./vendor/bin/phpunit  --colors=auto --coverage-html .phpunit.result.cache/html-code-coverage
 ```

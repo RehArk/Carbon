@@ -2,19 +2,30 @@
 
 namespace Rehark\Carbon\http\router;
 
+use Rehark\Carbon\http\method\HTTPMethods;
 use Rehark\Carbon\http\router\exception\ExistingRouteException;
+use Rehark\Carbon\http\router\exception\RouteFileException;
 use Rehark\Carbon\http\router\route\DefinitionRoute;
 use Rehark\Carbon\http\router\route\WebRoute;
 use Rehark\Carbon\http\router\uri\DefinitionUri;
 use Rehark\Carbon\http\router\uri\WebUri;
 
+/**
+ * Class Router represents a router for handling HTTP routes.
+ */
 class Router {
 
+    /**
+     * The path to the route files.
+     * @var string
+     */
+    private string $route_path;
+    
     /**
      * Array to store routes grouped by HTTP methods.
      * @var array
      */
-    public $routes = [
+    private array $routes = [
         'GET' => [],
         'POST' => [],
         'PUT' => [],
@@ -25,6 +36,88 @@ class Router {
         'CONNECT' => [],
         'TRACE' => [],
     ];
+
+    /**
+     * Constructor for Router.
+     * @param string $route_path The path to the route files.
+     */
+    public function __construct(string $route_path) {
+        $this->route_path = $route_path;
+    }
+
+
+    /**
+     * Loads routes from the route files.
+     * @throws RouteFileException If a route file is not found.
+     */
+    private function loadRoute() {
+
+        $route_file_provider = new RouteFileProvider($this->route_path);
+        $route_files = $route_file_provider->get();
+
+        foreach($route_files as $route_file) {
+            $this->load($route_file);
+        }
+
+        $this->sort();
+    }
+
+    /**
+     * Loads routes from a specific route file.
+     * @param string $route_file The path to the route file.
+     * @throws RouteFileException If the route file is not found.
+     */
+    private function load($route_file) {
+
+        if(!file_exists($route_file)) {
+            throw new RouteFileException();
+        }
+
+        require $route_file;
+
+    }
+
+    public function clearRoutes() : void {
+        $this->routes = [
+            'GET' => [],
+            'POST' => [],
+            'PUT' => [],
+            'DELETE' => [],
+            'PATCH' => [],
+            'HEAD' => [],
+            'OPTIONS' => [],
+            'CONNECT' => [],
+            'TRACE' => [],
+        ];
+    }
+
+    /**
+     * Starts the routing process for the requested URI and method.
+     * @param string $requested_uri The requested URI.
+     * @param string $request_method The HTTP request method.
+     * @return DefinitionRoute|null The matching route if found, otherwise null.
+     */
+
+    public function start(string $requested_uri, string $request_method) {
+
+        $this->loadRoute();
+
+        $web_uri = new WebUri($requested_uri);
+        $http_method = HTTPMethods::from($request_method);
+
+        $web_route = new WebRoute($web_uri, $http_method);
+
+        return $this->findRoute($web_route);
+
+    }
+
+    /**
+     * Gets all registered routes.
+     * @return array All registered routes.
+     */
+    public function getRoutes() {
+        return $this->routes;
+    }
 
     /**
      * Adds a route to the routes array.

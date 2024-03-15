@@ -5,7 +5,8 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Rehark\\Carbon\\": "src/"
+            "Rehark\\Carbon\\": "src/",
+            "Rehark\\Carbon\\Test\\": "test/"
         }
     },
     "require-dev": {

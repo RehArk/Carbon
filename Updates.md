@@ -1,3 +1,7 @@
+V0.0.3 - Handle request
+- Catch server request
+- Load route in routes file
+
 V0.0.2 - Routing
 - Add Routing system
 
