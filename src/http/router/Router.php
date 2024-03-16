@@ -49,8 +49,9 @@ class Router {
     /**
      * Loads routes from the route files.
      * @throws RouteFileException If a route file is not found.
+     * @return void
      */
-    private function loadRoute() {
+    private function loadRoute() : void {
 
         $route_file_provider = new RouteFileProvider($this->route_path);
         $route_files = $route_file_provider->get();
@@ -66,8 +67,9 @@ class Router {
      * Loads routes from a specific route file.
      * @param string $route_file The path to the route file.
      * @throws RouteFileException If the route file is not found.
+     * @return void
      */
-    private function load($route_file) {
+    private function load($route_file) : void {
 
         if(!file_exists($route_file)) {
             throw new RouteFileException();
@@ -98,7 +100,7 @@ class Router {
      * @return DefinitionRoute|null The matching route if found, otherwise null.
      */
 
-    public function start(string $requested_uri, string $request_method) {
+    public function start(string $requested_uri, string $request_method) : ?DefinitionRoute {
 
         $this->loadRoute();
 
@@ -115,7 +117,7 @@ class Router {
      * Gets all registered routes.
      * @return array All registered routes.
      */
-    public function getRoutes() {
+    public function getRoutes() : array {
         return $this->routes;
     }
 

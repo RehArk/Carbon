@@ -2,6 +2,8 @@
 
 namespace Rehark\Carbon;
 
+use Rehark\Carbon\http\response\Response;
+use Rehark\Carbon\http\router\route\DefinitionRoute;
 use Rehark\Carbon\http\router\Router;
 
 class DefaultKernel {
@@ -12,14 +14,16 @@ class DefaultKernel {
     public function __construct(string $root) {
         $this->root = $root;
         $this->initRouter();
-        $this->start();
+        $matching_route = $this->start();
+        $server_resposne = $this->buildResponse($matching_route);
+        $server_resposne->send();
     }
 
-    private function initRouter() {
+    private function initRouter() : void {
         $this->router = new Router($this->root);
     }
 
-    private function start() {
+    private function start() : ?DefinitionRoute {
 
         $real_requested_uri = $_SERVER["REDIRECT_URL"] ?? '/';
         $request_method = $_SERVER["REQUEST_METHOD"] ?? 'GET';
@@ -29,6 +33,36 @@ class DefaultKernel {
             $request_method
         );
 
+        return $matching_route;
+
+    }
+
+    private function buildResponse(?DefinitionRoute $matching_route) : Response {
+
+        if(!$matching_route) {
+            return new Response(404, 'Resource not found !');
+        }
+
+        $className = $matching_route->getController();
+        $methodName = $matching_route->getClassMethod();
+
+        if (!class_exists($className)) {
+            return new Response(500, "No class found !");
+        }
+
+        if (!method_exists($className, $methodName)) {
+            return new Response(500, "No method found !");
+        }
+
+        $controllerInstance = new $className();
+        $response = $controllerInstance->$methodName();
+
+        if($response) {
+            return $response;
+        }
+        
+        return new Response(200, '');
+        
     }
 
 }

@@ -1,6 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
+use Rehark\Carbon\component\controller\DefaultController;
 use Rehark\Carbon\http\method\HTTPMethods;
 use Rehark\Carbon\http\router\exception\ExistingRouteException;
 use Rehark\Carbon\http\router\exception\RouteFileException;
@@ -47,6 +48,23 @@ final class RouterTest extends TestCase
         $this->assertEquals(sizeof($router->getRoutes()["GET"]), 2);
     }
 
+    public function testClearRoute() {
+        $router = new Router(__DIR__);
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::GET, DefaultController::class, 'serverStatus'));
+        $router->clearRoutes();
+        $this->assertSame($router->getRoutes(),[
+            'GET' => [],
+            'POST' => [],
+            'PUT' => [],
+            'DELETE' => [],
+            'PATCH' => [],
+            'HEAD' => [],
+            'OPTIONS' => [],
+            'CONNECT' => [],
+            'TRACE' => [],
+        ]);
+    }
+
     public function testLoad() {
         $router = new Router(__DIR__);
         $load = MethodsMocker::getMethod(Router::class, 'load');
@@ -58,15 +76,15 @@ final class RouterTest extends TestCase
 
         $router = new Router(__DIR__);
 
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::GET));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::POST));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::PUT));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::DELETE));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::PATCH));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::HEAD));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::OPTIONS));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::CONNECT));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::TRACE));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::GET, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::PUT, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::DELETE, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::PATCH, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::HEAD, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::OPTIONS, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::CONNECT, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::TRACE, DefaultController::class, 'serverStatus'));
 
         foreach($router->getRoutes() as $httpRoutes) {
             $this->assertInstanceOf(DefinitionRoute::class, $httpRoutes[0]);
@@ -79,14 +97,14 @@ final class RouterTest extends TestCase
         $router = new Router(__DIR__);
         $compareRoutes = MethodsMocker::getMethod(Router::class, 'compareRoutes');
         
-        $route1 = new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::GET);
-        $route2 = new DefinitionRoute(new DefinitionUri('/test'), HTTPMethods::GET);
+        $route1 = new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::GET, DefaultController::class, 'serverStatus');
+        $route2 = new DefinitionRoute(new DefinitionUri('/test'), HTTPMethods::GET, DefaultController::class, 'serverStatus');
 
         $this->assertEquals($compareRoutes->invokeArgs($router, [$route1, $route2]), -1);
         $this->assertEquals($compareRoutes->invokeArgs($router, [$route2, $route1]), 1);
 
-        $route1 = new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::GET);
-        $route2 = new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::GET);
+        $route1 = new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::GET, DefaultController::class, 'serverStatus');
+        $route2 = new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::GET, DefaultController::class, 'serverStatus');
 
         $this->expectException(ExistingRouteException::class);
         $compareRoutes->invokeArgs($router, [$route2, $route1]);
@@ -109,66 +127,66 @@ final class RouterTest extends TestCase
 
         $router = new Router(__DIR__);
 
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::GET));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/new-route'), HTTPMethods::GET));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/route'), HTTPMethods::GET));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/route/{param}'), HTTPMethods::GET));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}'), HTTPMethods::GET));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/check'), HTTPMethods::GET));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/get'), HTTPMethods::GET));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/{other-param}'), HTTPMethods::GET));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::GET, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/new-route'), HTTPMethods::GET, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/route'), HTTPMethods::GET, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/route/{param}'), HTTPMethods::GET, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}'), HTTPMethods::GET, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/check'), HTTPMethods::GET, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/get'), HTTPMethods::GET, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/{other-param}'), HTTPMethods::GET, DefaultController::class, 'serverStatus'));
         $router->sort();
 
         $expectation = [
-            new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::GET),
-            new DefinitionRoute(new DefinitionUri('/new-route'), HTTPMethods::GET),
-            new DefinitionRoute(new DefinitionUri('/route'), HTTPMethods::GET),
-            new DefinitionRoute(new DefinitionUri('/route/{param}'), HTTPMethods::GET),
-            new DefinitionRoute(new DefinitionUri('/{param}'), HTTPMethods::GET),
-            new DefinitionRoute(new DefinitionUri('/{param}/check'), HTTPMethods::GET),
-            new DefinitionRoute(new DefinitionUri('/{param}/get'), HTTPMethods::GET),
-            new DefinitionRoute(new DefinitionUri('/{param}/{other-param}'), HTTPMethods::GET)
+            new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::GET, DefaultController::class, 'serverStatus'),
+            new DefinitionRoute(new DefinitionUri('/new-route'), HTTPMethods::GET, DefaultController::class, 'serverStatus'),
+            new DefinitionRoute(new DefinitionUri('/route'), HTTPMethods::GET, DefaultController::class, 'serverStatus'),
+            new DefinitionRoute(new DefinitionUri('/route/{param}'), HTTPMethods::GET, DefaultController::class, 'serverStatus'),
+            new DefinitionRoute(new DefinitionUri('/{param}'), HTTPMethods::GET, DefaultController::class, 'serverStatus'),
+            new DefinitionRoute(new DefinitionUri('/{param}/check'), HTTPMethods::GET, DefaultController::class, 'serverStatus'),
+            new DefinitionRoute(new DefinitionUri('/{param}/get'), HTTPMethods::GET, DefaultController::class, 'serverStatus'),
+            new DefinitionRoute(new DefinitionUri('/{param}/{other-param}'), HTTPMethods::GET, DefaultController::class, 'serverStatus')
         ];
 
         $this->assertEquals($router->getRoutes()["GET"], $expectation);
 
         $router = new Router(__DIR__);
 
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/route/{param}'), HTTPMethods::POST));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/new-route'), HTTPMethods::POST));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}'), HTTPMethods::POST));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/check'), HTTPMethods::POST));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/route'), HTTPMethods::POST));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/post'), HTTPMethods::POST));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/{other-param}'), HTTPMethods::POST));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::POST));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/route/{param}'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/new-route'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/check'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/route'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/post'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/{other-param}'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
         $router->sort();
 
         $expectation = [
-            new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::POST),
-            new DefinitionRoute(new DefinitionUri('/new-route'), HTTPMethods::POST),
-            new DefinitionRoute(new DefinitionUri('/route'), HTTPMethods::POST),
-            new DefinitionRoute(new DefinitionUri('/route/{param}'), HTTPMethods::POST),
-            new DefinitionRoute(new DefinitionUri('/{param}'), HTTPMethods::POST),
-            new DefinitionRoute(new DefinitionUri('/{param}/check'), HTTPMethods::POST),
-            new DefinitionRoute(new DefinitionUri('/{param}/post'), HTTPMethods::POST),
-            new DefinitionRoute(new DefinitionUri('/{param}/{other-param}'), HTTPMethods::POST)
+            new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::POST, DefaultController::class, 'serverStatus'),
+            new DefinitionRoute(new DefinitionUri('/new-route'), HTTPMethods::POST, DefaultController::class, 'serverStatus'),
+            new DefinitionRoute(new DefinitionUri('/route'), HTTPMethods::POST, DefaultController::class, 'serverStatus'),
+            new DefinitionRoute(new DefinitionUri('/route/{param}'), HTTPMethods::POST, DefaultController::class, 'serverStatus'),
+            new DefinitionRoute(new DefinitionUri('/{param}'), HTTPMethods::POST, DefaultController::class, 'serverStatus'),
+            new DefinitionRoute(new DefinitionUri('/{param}/check'), HTTPMethods::POST, DefaultController::class, 'serverStatus'),
+            new DefinitionRoute(new DefinitionUri('/{param}/post'), HTTPMethods::POST, DefaultController::class, 'serverStatus'),
+            new DefinitionRoute(new DefinitionUri('/{param}/{other-param}'), HTTPMethods::POST, DefaultController::class, 'serverStatus')
         ];
 
         $this->assertEquals($router->getRoutes()["POST"], $expectation);
 
         $router = new Router(__DIR__);
 
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::PUT));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::PUT));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::PUT, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::PUT, DefaultController::class, 'serverStatus'));
 
         $this->expectException(ExistingRouteException::class);
         $router->sort();
 
         $router = new Router(__DIR__);
 
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param-a}'), HTTPMethods::PUT));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param-b}'), HTTPMethods::PUT));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param-a}'), HTTPMethods::PUT, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param-b}'), HTTPMethods::PUT, DefaultController::class, 'serverStatus'));
 
         $this->expectException(ExistingRouteException::class);
         $router->sort();
@@ -181,13 +199,13 @@ final class RouterTest extends TestCase
         $matchRoutes = MethodsMocker::getMethod(Router::class, 'matchRoutes');
 
         $webRoute1 = new WebRoute(new WebUri('/'), HTTPMethods::POST);
-        $defintionRoute1 = new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::POST);
+        $defintionRoute1 = new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::POST, DefaultController::class, 'serverStatus');
 
         $webRoute2 = new WebRoute(new WebUri('/param'), HTTPMethods::POST);
-        $defintionRoute2 = new DefinitionRoute(new DefinitionUri('/{param}'), HTTPMethods::POST);
+        $defintionRoute2 = new DefinitionRoute(new DefinitionUri('/{param}'), HTTPMethods::POST, DefaultController::class, 'serverStatus');
 
         $webRoute3 = new WebRoute(new WebUri('/test-1'), HTTPMethods::POST);
-        $defintionRoute3 = new DefinitionRoute(new DefinitionUri('/test-{number}'), HTTPMethods::POST);
+        $defintionRoute3 = new DefinitionRoute(new DefinitionUri('/test-{number}'), HTTPMethods::POST, DefaultController::class, 'serverStatus');
         
         $this->assertEquals($matchRoutes->invokeArgs($router, [$webRoute1->getUri(), $defintionRoute1->getUri()]), 1);
         $this->assertEquals($matchRoutes->invokeArgs($router, [$webRoute1->getUri(), $defintionRoute2->getUri()]), 0);
@@ -208,28 +226,28 @@ final class RouterTest extends TestCase
         $router = new Router(__DIR__);
         $findRoute = MethodsMocker::getMethod(Router::class, 'findRoute');
 
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/route/{param}'), HTTPMethods::POST));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/new-route'), HTTPMethods::POST));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}'), HTTPMethods::POST));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/check'), HTTPMethods::POST));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/route'), HTTPMethods::POST));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/post'), HTTPMethods::POST));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/{other-param}'), HTTPMethods::POST));
-        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::POST));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/route/{param}'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/new-route'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/check'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/route'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/post'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/{param}/{other-param}'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
+        $router->addRoute(new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::POST, DefaultController::class, 'serverStatus'));
 
         $router->sort();
 
         $webRoute1 = new WebRoute(new WebUri('/'), HTTPMethods::POST);
-        $expectation1 = new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::POST);
+        $expectation1 = new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::POST, DefaultController::class, 'serverStatus');
 
         $webRoute2 = new WebRoute(new WebUri('/new-route'), HTTPMethods::POST);
-        $expectation2 = new DefinitionRoute(new DefinitionUri('/new-route'), HTTPMethods::POST);
+        $expectation2 = new DefinitionRoute(new DefinitionUri('/new-route'), HTTPMethods::POST, DefaultController::class, 'serverStatus');
 
         $webRoute3 = new WebRoute(new WebUri('/test-param'), HTTPMethods::POST);
-        $expectation3 = new DefinitionRoute(new DefinitionUri('/{param}'), HTTPMethods::POST);
+        $expectation3 = new DefinitionRoute(new DefinitionUri('/{param}'), HTTPMethods::POST, DefaultController::class, 'serverStatus');
 
         $webRoute4 = new WebRoute(new WebUri('/test-param/test-parme'), HTTPMethods::POST);
-        $expectation4 = new DefinitionRoute(new DefinitionUri('/{param}/{other-param}'), HTTPMethods::POST);
+        $expectation4 = new DefinitionRoute(new DefinitionUri('/{param}/{other-param}'), HTTPMethods::POST, DefaultController::class, 'serverStatus');
 
         $webRoute5 = new WebRoute(new WebUri('/it/test/not-found'), HTTPMethods::POST);
         $expectation5 = null;

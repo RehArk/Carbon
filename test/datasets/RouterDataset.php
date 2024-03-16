@@ -10,46 +10,55 @@ class RouterDataset {
 
         Dir::mk($dir . '/' . 'routes');
         
-        Dir::addFile($dir . '/' . 'routes', 'base_routes.php','
-            <?php
+        Dir::addFile($dir . '/' . 'routes', 'base_routes.php',
+            '<?php '."\n\n".
 
-            use Rehark\Carbon\http\method\HTTPMethods;
-            use Rehark\Carbon\http\router\route\DefinitionRoute;
-            use Rehark\Carbon\http\router\uri\DefinitionUri;
+            'use Rehark\Carbon\http\method\HTTPMethods;'."\n".
+            'use Rehark\Carbon\http\router\route\DefinitionRoute;'."\n".
+            'use Rehark\Carbon\http\router\uri\DefinitionUri;'."\n".
+            'use Rehark\Carbon\component\controller\DefaultController;'."\n\n".
             
-            $this->addRoute(new DefinitionRoute(
-                new DefinitionUri(\'/\'),
-                HTTPMethods::GET
-            ));
-        ');
+            '$this->addRoute(new DefinitionRoute('."\n".
+            '    new DefinitionUri(\'/\'),'."\n".
+            '    HTTPMethods::GET,'."\n".
+            '    DefaultController::class,'."\n".
+            '    \'serverStatus\''."\n".
+            '));'
+        );
 
         Dir::mk($dir . '/' . 'routes/others');
 
-        Dir::addFile($dir . '/' . 'routes/others', 'extended_routes.php','
-            <?php
+        Dir::addFile($dir . '/' . 'routes/others', 'extended_routes.php',
+            '<?php '."\n\n".
 
-            use Rehark\Carbon\http\method\HTTPMethods;
-            use Rehark\Carbon\http\router\route\DefinitionRoute;
-            use Rehark\Carbon\http\router\uri\DefinitionUri;
+            'use Rehark\Carbon\http\method\HTTPMethods;'."\n".
+            'use Rehark\Carbon\http\router\route\DefinitionRoute;'."\n".
+            'use Rehark\Carbon\http\router\uri\DefinitionUri;'."\n".
+            'use Rehark\Carbon\component\controller\DefaultController;'."\n\n".
             
-            $this->addRoute(new DefinitionRoute(
-                new DefinitionUri(\'/other\'),
-                HTTPMethods::GET
-            ));
-        ');
+            '$this->addRoute(new DefinitionRoute('."\n".
+            '    new DefinitionUri(\'/other\'),'."\n".
+            '    HTTPMethods::GET,'."\n".
+            '    DefaultController::class,'."\n".
+            '    \'serverStatus\''."\n".
+            '));'
+        );
 
-        Dir::addFile($dir . '/' . 'routes/others', 'extended_routes.ignore','
-            <?php
+        Dir::addFile($dir . '/' . 'routes/others', 'extended_routes.ignore',
+            '<?php '."\n\n".
 
-            use Rehark\Carbon\http\method\HTTPMethods;
-            use Rehark\Carbon\http\router\route\DefinitionRoute;
-            use Rehark\Carbon\http\router\uri\DefinitionUri;
+            'use Rehark\Carbon\http\method\HTTPMethods;'."\n".
+            'use Rehark\Carbon\http\router\route\DefinitionRoute;'."\n".
+            'use Rehark\Carbon\http\router\uri\DefinitionUri;'."\n".
+            'use Rehark\Carbon\component\controller\DefaultController;'."\n\n".
             
-            $this->addRoute(new DefinitionRoute(
-                new DefinitionUri(\'/ignore\'),
-                HTTPMethods::GET
-            ));
-        ');
+            '$this->addRoute(new DefinitionRoute('."\n".
+            '    new DefinitionUri(\'/ignore\'),'."\n".
+            '    HTTPMethods::GET,'."\n".
+            '    DefaultController::class,'."\n".
+            '    \'serverStatus\''."\n".
+            '));'
+        );
     }
 
     public static function clear(string $dir) {
