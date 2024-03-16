@@ -1,3 +1,6 @@
+V0.0.5 - Fix web route error
+- Fix the route error when it ends up /
+
 V0.0.4 - Send Response
 - Handle route not found
 - Add controller to definition route

@@ -27,6 +27,30 @@ final class DefaultKernelTest extends TestCase
         $this->assertInstanceOf(DefaultKernel::class, $kernel);
     }
 
+    public function testFormatRequestedUri(): void {
+        
+        $kernel = new DefaultKernel(__DIR__);
+        $this->assertInstanceOf(DefaultKernel::class, $kernel);
+        ob_clean();
+
+        $formatRequestedUri = MethodsMocker::getMethod(DefaultKernel::class, 'formatRequestedUri');
+        $uri = $formatRequestedUri->invokeArgs($kernel, [null]);
+        $this->assertEquals($uri, '/');
+
+        $formatRequestedUri = MethodsMocker::getMethod(DefaultKernel::class, 'formatRequestedUri');
+        $uri = $formatRequestedUri->invokeArgs($kernel, ['/']);
+        $this->assertEquals($uri, '/');
+
+        $formatRequestedUri = MethodsMocker::getMethod(DefaultKernel::class, 'formatRequestedUri');
+        $uri = $formatRequestedUri->invokeArgs($kernel, ['/test']);
+        $this->assertEquals($uri, '/test');
+
+        $formatRequestedUri = MethodsMocker::getMethod(DefaultKernel::class, 'formatRequestedUri');
+        $uri = $formatRequestedUri->invokeArgs($kernel, ['/test/']);
+        $this->assertEquals($uri, '/test');
+
+    }
+
     public function testbuildResponseWithFoundedRouteWithResponse() {
 
         $kernel = new DefaultKernel(__DIR__);

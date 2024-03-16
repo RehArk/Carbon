@@ -25,7 +25,7 @@ class DefaultKernel {
 
     private function start() : ?DefinitionRoute {
 
-        $real_requested_uri = $_SERVER["REDIRECT_URL"] ?? '/';
+        $real_requested_uri = $this->formatRequestedUri($_SERVER["REDIRECT_URL"] ?? null);
         $request_method = $_SERVER["REQUEST_METHOD"] ?? 'GET';
         
         $matching_route = $this->router->start(
@@ -34,6 +34,22 @@ class DefaultKernel {
         );
 
         return $matching_route;
+
+    }
+
+    private function formatRequestedUri(?string $uri) : string {
+
+        if(!$uri) {
+            return '/';
+        }
+
+        $uri = rtrim($uri, '/');
+
+        if($uri) {
+            return $uri;
+        }
+
+        return '/';
 
     }
 
