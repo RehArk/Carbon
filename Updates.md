@@ -1,3 +1,6 @@
+V0.1.0 - Carbon V0.1.0
+- Update read me with documentation
+
 V0.0.5 - Fix web route error
 - Fix the route error when it ends up /
 
