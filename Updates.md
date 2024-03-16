@@ -1,3 +1,6 @@
+V0.1.1 - Better way to create route
+- Implement route creation methods for all HTTP methods.
+
 V0.1.0 - Carbon V0.1.0
 - Update read me with documentation
 

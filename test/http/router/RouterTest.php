@@ -110,18 +110,6 @@ final class RouterTest extends TestCase
         $compareRoutes->invokeArgs($router, [$route2, $route1]);
 
     }
-    
-    public function testRemoveBraceContent() {
-
-        $router = new Router(__DIR__);
-        $removeBraceContent = MethodsMocker::getMethod(Router::class, 'removeBraceContent');
-        
-        $this->assertEquals($removeBraceContent->invokeArgs($router, ["{aaa}"]), "{}");
-        $this->assertEquals($removeBraceContent->invokeArgs($router, ["aaa-{aaa}"]), "aaa-{}");
-        $this->assertEquals($removeBraceContent->invokeArgs($router, ["aaa-{aaa}-aaa"]), "aaa-{}-aaa");
-        $this->assertEquals($removeBraceContent->invokeArgs($router, ["{aaa}-aaa"]), "{}-aaa");
-
-    }
 
     public function testSort() {
 
@@ -257,6 +245,27 @@ final class RouterTest extends TestCase
         $this->assertEquals($findRoute->invokeArgs($router, [$webRoute3]), $expectation3);
         $this->assertEquals($findRoute->invokeArgs($router, [$webRoute4]), $expectation4);
         $this->assertEquals($findRoute->invokeArgs($router, [$webRoute5]), $expectation5);
+
+    }
+
+    public function testShortRouteCreation () {
+
+        $router = new Router(__DIR__);
+
+        foreach($router->getRoutes() as $key => $value) {
+
+
+            $router->$key('/users', 'UserController', 'index');
+
+            $routes = $router->getRoutes()[$key];
+            $route = $routes[0];
+            
+            $this->assertCount(1, $routes);
+            $this->assertEquals('/users', $route->getUri()->getString());
+            $this->assertEquals('UserController', $route->getController());
+            $this->assertEquals('index', $route->getClassMethod());
+
+        }
 
     }
 

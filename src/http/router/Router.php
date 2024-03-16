@@ -131,34 +131,24 @@ class Router {
         $this->routes[$httpMethod->value][] = $route;
     }
 
-    /**
-     * Compares two routes based on their URIs.
-     * @param DefinitionRoute $routeA First route to compare.
-     * @param DefinitionRoute $routeB Second route to compare.
-     * @return int The result of comparison.
-     * @throws ExistingRouteException If two routes have the same URI.
-     */
-    private function compareRoutes(DefinitionRoute $routeA, DefinitionRoute $routeB) : int {
-
-        $uriA = $this->removeBraceContent($routeA->getUri()->string);
-        $uriB = $this->removeBraceContent($routeB->getUri()->string);
-
-        $cmp = strcmp($uriA, $uriB);
-
-        if ($cmp == 0) {
-            throw new ExistingRouteException();
-        }
-
-        return $cmp;
+    public function createRoute(HTTPMethods $method, string $uri, string $controller, string $classMethod) {
+        $this->addRoute(new DefinitionRoute(
+            new DefinitionUri($uri),
+            $method,
+            $controller,
+            $classMethod
+        ));
     }
 
+
     /**
-     * Removes content inside braces from a string.
-     * @param string $string The string from which to remove braces.
-     * @return array|string|null The string with braces removed.
+     * Compares two DefinitionRoute objects.
+     * @param DefinitionRoute $routeA The first DefinitionRoute object to compare.
+     * @param DefinitionRoute $routeB The second DefinitionRoute object to compare.
+     * @return int An integer value indicating the result of the comparison.
      */
-    private function removeBraceContent($string) : array|string|null {
-        return preg_replace('/\{.*?\}/', '{}', $string);
+    private function compareRoutes(DefinitionRoute $routeA, DefinitionRoute $routeB) : int {
+        return $routeA->compare($routeB);
     }
 
     /**
@@ -207,6 +197,42 @@ class Router {
 
         $regex = '#^' . $pattern . '$#';
         return preg_match($regex, $webUri->string);
+    }
+
+    public function get(string $uri, string $controller, string $classMethod) {
+        $this->createRoute(HTTPMethods::GET, $uri, $controller, $classMethod);
+    }
+
+    public function post(string $uri, string $controller, string $classMethod) {
+        $this->createRoute(HTTPMethods::POST, $uri, $controller, $classMethod);
+    }
+
+    public function put(string $uri, string $controller, string $classMethod) {
+        $this->createRoute(HTTPMethods::PUT, $uri, $controller, $classMethod);
+    }
+
+    public function delete(string $uri, string $controller, string $classMethod) {
+        $this->createRoute(HTTPMethods::DELETE, $uri, $controller, $classMethod);
+    }
+
+    public function patch(string $uri, string $controller, string $classMethod) {
+        $this->createRoute(HTTPMethods::PATCH, $uri, $controller, $classMethod);
+    }
+
+    public function head(string $uri, string $controller, string $classMethod) {
+        $this->createRoute(HTTPMethods::HEAD, $uri, $controller, $classMethod);
+    }
+
+    public function options(string $uri, string $controller, string $classMethod) {
+        $this->createRoute(HTTPMethods::OPTIONS, $uri, $controller, $classMethod);
+    }
+
+    public function connect(string $uri, string $controller, string $classMethod) {
+        $this->createRoute(HTTPMethods::CONNECT, $uri, $controller, $classMethod);
+    }
+
+    public function trace(string $uri, string $controller, string $classMethod) {
+        $this->createRoute(HTTPMethods::TRACE, $uri, $controller, $classMethod);
     }
 
 }
