@@ -7,7 +7,7 @@ use Exception;
 class InvalidHttpCodeException extends Exception{
 
     public function __construct(int $http_code) {
-        parent::__construct('HTTP code ' . $http_code . ' not exist', 1);
+        parent::__construct('HTTP code ' . $http_code . ' not exist');
     }
 
 }

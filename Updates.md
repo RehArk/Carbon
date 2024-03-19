@@ -1,3 +1,7 @@
+V0.1.2 - Add server response type
+- Add json response
+- Add file response
+
 V0.1.1 - Better way to create route
 - Implement route creation methods for all HTTP methods.
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Rehark\Carbon\http\response;
+namespace Rehark\Carbon\http\response\http_code;
 
 enum HttpCode : int {
 

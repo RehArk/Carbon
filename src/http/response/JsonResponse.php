@@ -2,9 +2,7 @@
 
 namespace Rehark\Carbon\http\response;
 
-use Rehark\Carbon\http\response\exception\InvalidResponseException;
-
-class Response extends AbstractResponse {
+class JsonResponse extends AbstractResponse {
 
     /**
      * set the current header
@@ -18,7 +16,7 @@ class Response extends AbstractResponse {
             $this->http_code->value
         );
 
-        header('Content-Type: text/html; charset=utf-8');
+        header('Content-Type: application/json; charset=utf-8');
 
         return $this;
 
@@ -29,14 +27,8 @@ class Response extends AbstractResponse {
      * @return self
      */
     public function setContent(mixed $content) : self {
-
-        if(gettype($content) != "string") {
-            throw new InvalidResponseException();
-        }
-
-        $this->content = $content;
+        $this->content = json_encode($content);
         return $this;
-
     }
 
 }

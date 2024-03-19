@@ -2,7 +2,8 @@
 
 use PHPUnit\Framework\TestCase;
 use Rehark\Carbon\http\response\exception\InvalidHttpCodeException;
-use Rehark\Carbon\http\response\HttpCode;
+use Rehark\Carbon\http\response\exception\InvalidResponseException;
+use Rehark\Carbon\http\response\http_code\HttpCode;
 use Rehark\Carbon\http\response\Response;
 
 class ResponseTest extends TestCase {
@@ -20,6 +21,17 @@ class ResponseTest extends TestCase {
         $this->expectException(InvalidHttpCodeException::class);
         $response = new Response(1000, 'Fail');
 
+    }
+
+    // public function testSetHeader() {
+
+    // }
+
+    public function testSetContent() {
+
+        $this->expectException(InvalidResponseException::class);
+        $response = new Response(200, new stdClass());
+        
     }
 
 }

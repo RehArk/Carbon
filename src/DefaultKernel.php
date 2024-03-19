@@ -2,6 +2,7 @@
 
 namespace Rehark\Carbon;
 
+use Rehark\Carbon\http\response\AbstractResponse;
 use Rehark\Carbon\http\response\Response;
 use Rehark\Carbon\http\router\route\DefinitionRoute;
 use Rehark\Carbon\http\router\Router;
@@ -53,7 +54,7 @@ class DefaultKernel {
 
     }
 
-    private function buildResponse(?DefinitionRoute $matching_route) : Response {
+    private function buildResponse(?DefinitionRoute $matching_route) : AbstractResponse {
 
         if(!$matching_route) {
             return new Response(404, 'Resource not found !');
