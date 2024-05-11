@@ -1,5 +1,5 @@
 # carbon
-Carbon is a small PHP framework, light as fiber, strong as carbon.
+Carbon is a small PHP framework, light as fiber, strong as diamond.
 
 ## Create Route
 
