@@ -6,6 +6,7 @@ use Rehark\Carbon\DefaultKernel;
 use Rehark\Carbon\http\method\HTTPMethods;
 use Rehark\Carbon\http\response\Response;
 use Rehark\Carbon\http\router\route\DefinitionRoute;
+use Rehark\Carbon\http\router\Router;
 use Rehark\Carbon\http\router\uri\DefinitionUri;
 use Rehark\Carbon\Test\datasets\RouterDataset;
 use Rehark\Carbon\Test\utils\MethodsMocker;
@@ -13,6 +14,7 @@ use Rehark\Carbon\Test\utils\MethodsMocker;
 final class DefaultKernelTest extends TestCase
 {    
 
+    
     public function setUp() : void {
         RouterDataset::create(__DIR__);
     }
@@ -23,13 +25,15 @@ final class DefaultKernelTest extends TestCase
 
     public function testConstructor(): void {
         $this->expectOutputString('Server on.');
-        $kernel = new DefaultKernel(__DIR__);
+        $router = new Router(__DIR__);
+        $kernel = new DefaultKernel($router);
         $this->assertInstanceOf(DefaultKernel::class, $kernel);
     }
 
     public function testFormatRequestedUri(): void {
         
-        $kernel = new DefaultKernel(__DIR__);
+        $router = new Router(__DIR__);
+        $kernel = new DefaultKernel($router);
         $this->assertInstanceOf(DefaultKernel::class, $kernel);
         ob_clean();
 
@@ -53,7 +57,8 @@ final class DefaultKernelTest extends TestCase
 
     public function testbuildResponseWithFoundedRouteWithResponse() {
 
-        $kernel = new DefaultKernel(__DIR__);
+        $router = new Router(__DIR__);
+        $kernel = new DefaultKernel($router);
         ob_clean();
 
         $buildResponse = MethodsMocker::getMethod(DefaultKernel::class, 'buildResponse');
@@ -67,7 +72,8 @@ final class DefaultKernelTest extends TestCase
     
     public function testbuildResponseWithRouteWithNoResponse() {
 
-        $kernel = new DefaultKernel(__DIR__);
+        $router = new Router(__DIR__);
+        $kernel = new DefaultKernel($router);
         ob_clean();
 
         $buildResponse = MethodsMocker::getMethod(DefaultKernel::class, 'buildResponse');
@@ -81,7 +87,8 @@ final class DefaultKernelTest extends TestCase
 
     public function testbuildResponseWithNotRoute() {
 
-        $kernel = new DefaultKernel(__DIR__);
+        $router = new Router(__DIR__);
+        $kernel = new DefaultKernel($router);
         ob_clean();
 
         $buildResponse = MethodsMocker::getMethod(DefaultKernel::class, 'buildResponse');
@@ -95,7 +102,8 @@ final class DefaultKernelTest extends TestCase
 
     public function testbuildResponseWithRouteInvalidController() {
 
-        $kernel = new DefaultKernel(__DIR__);
+        $router = new Router(__DIR__);
+        $kernel = new DefaultKernel($router);
         ob_clean();
 
         $buildResponse = MethodsMocker::getMethod(DefaultKernel::class, 'buildResponse');
@@ -109,7 +117,8 @@ final class DefaultKernelTest extends TestCase
 
     public function testbuildResponseWithRouteInvalidMethod() {
 
-        $kernel = new DefaultKernel(__DIR__);
+        $router = new Router(__DIR__);
+        $kernel = new DefaultKernel($router);
         ob_clean();
 
         $buildResponse = MethodsMocker::getMethod(DefaultKernel::class, 'buildResponse');

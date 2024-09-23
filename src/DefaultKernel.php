@@ -9,19 +9,15 @@ use Rehark\Carbon\http\router\Router;
 
 class DefaultKernel {
 
-    private string $root;
     public Router $router;
 
-    public function __construct(string $root) {
-        $this->root = $root;
-        $this->initRouter();
+    public function __construct(Router $router) {
+
+        $this->router = $router;
+        
         $matching_route = $this->start();
         $server_resposne = $this->buildResponse($matching_route);
         $server_resposne->send();
-    }
-
-    private function initRouter() : void {
-        $this->router = new Router($this->root);
     }
 
     private function start() : ?DefinitionRoute {
