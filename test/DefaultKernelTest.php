@@ -12,26 +12,28 @@ use Rehark\Carbon\Test\datasets\RouterDataset;
 use Rehark\Carbon\Test\utils\MethodsMocker;
 
 final class DefaultKernelTest extends TestCase
-{    
+{
 
-    
-    public function setUp() : void {
+    public function setUp(): void
+    {
         RouterDataset::create(__DIR__);
     }
 
-    public function tearDown() : void {
+    public function tearDown(): void
+    {
         RouterDataset::clear(__DIR__);
     }
 
-    public function testConstructor(): void {
-        $this->expectOutputString('Server on.');
+    public function testConstructor(): void
+    {
         $router = new Router(__DIR__);
         $kernel = new DefaultKernel($router);
         $this->assertInstanceOf(DefaultKernel::class, $kernel);
     }
 
-    public function testFormatRequestedUri(): void {
-        
+    public function testFormatRequestedUri(): void
+    {
+
         $router = new Router(__DIR__);
         $kernel = new DefaultKernel($router);
         $this->assertInstanceOf(DefaultKernel::class, $kernel);
@@ -52,10 +54,10 @@ final class DefaultKernelTest extends TestCase
         $formatRequestedUri = MethodsMocker::getMethod(DefaultKernel::class, 'formatRequestedUri');
         $uri = $formatRequestedUri->invokeArgs($kernel, ['/test/']);
         $this->assertEquals($uri, '/test');
-
     }
 
-    public function testbuildResponseWithFoundedRouteWithResponse() {
+    public function testbuildResponseWithFoundedRouteWithResponse()
+    {
 
         $router = new Router(__DIR__);
         $kernel = new DefaultKernel($router);
@@ -65,12 +67,12 @@ final class DefaultKernelTest extends TestCase
         $route = new DefinitionRoute(new DefinitionUri('/'), HTTPMethods::GET, DefaultController::class, 'serverStatus');
         $response = $buildResponse->invokeArgs($kernel, [$route]);
         $this->assertInstanceOf(Response::class, $response);
-        $this->expectOutputString('Server on.');
+        $this->expectOutputString('Server on at ' . (new DateTime())->format('Y-m-d H:i:s') . '.');
         $response->send();
-
     }
-    
-    public function testbuildResponseWithRouteWithNoResponse() {
+
+    public function testbuildResponseWithRouteWithNoResponse()
+    {
 
         $router = new Router(__DIR__);
         $kernel = new DefaultKernel($router);
@@ -82,10 +84,10 @@ final class DefaultKernelTest extends TestCase
         $this->assertInstanceOf(Response::class, $response);
         $this->expectOutputString('');
         $response->send();
-
     }
 
-    public function testbuildResponseWithNotRoute() {
+    public function testbuildResponseWithNotRoute()
+    {
 
         $router = new Router(__DIR__);
         $kernel = new DefaultKernel($router);
@@ -97,10 +99,10 @@ final class DefaultKernelTest extends TestCase
         $this->assertInstanceOf(Response::class, $response);
         $this->expectOutputString('Resource not found !');
         $response->send();
-
     }
 
-    public function testbuildResponseWithRouteInvalidController() {
+    public function testbuildResponseWithRouteInvalidController()
+    {
 
         $router = new Router(__DIR__);
         $kernel = new DefaultKernel($router);
@@ -112,10 +114,10 @@ final class DefaultKernelTest extends TestCase
         $this->assertInstanceOf(Response::class, $response);
         $this->expectOutputString('No class found !');
         $response->send();
-
     }
 
-    public function testbuildResponseWithRouteInvalidMethod() {
+    public function testbuildResponseWithRouteInvalidMethod()
+    {
 
         $router = new Router(__DIR__);
         $kernel = new DefaultKernel($router);
@@ -127,7 +129,5 @@ final class DefaultKernelTest extends TestCase
         $this->assertInstanceOf(Response::class, $response);
         $this->expectOutputString('No method found !');
         $response->send();
-
     }
-
 }

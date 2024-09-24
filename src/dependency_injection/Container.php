@@ -49,7 +49,14 @@ class Container
      * The constructor is private to enforce the Singleton pattern, preventing
      * direct instantiation of the class.
      */
-    private function __construct() {}
+    private function __construct()
+    {
+        $this->dependencies = [
+            'class' => [],
+            'interface' => [],
+            'instance' => []
+        ];
+    }
 
     /**
      * Registers a class, interface, or instance in the container.
@@ -83,6 +90,10 @@ class Container
 
         if ($this->instanceExist($key)) {
             return $this->getValueOf($key);
+        }
+
+        if ($this->defineType($key) == 'class') {
+            return $this->build($key, $parameters);
         }
 
         return $this->build($this->getValueOf($key), $parameters);
@@ -178,6 +189,12 @@ class Container
     private function dependencyExist(string $key)
     {
         $type = $this->defineType($key);
+
+        // If it's a class, it will implicitly be a dependency.
+        if ($type == 'class') {
+            return true;
+        }
+
         return array_key_exists($key, $this->dependencies[$type]);
     }
 
@@ -193,10 +210,6 @@ class Container
 
         if (!$this->dependencyExist($key)) {
             return false;
-        }
-
-        if (!is_string($this->getValueOf($key))) {
-            return true;
         }
 
         if (

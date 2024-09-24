@@ -1,6 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
+use Rehark\Carbon\component\controller\DefaultController;
 use Rehark\Carbon\dependency_injection\Container;
 use Rehark\Carbon\dependency_injection\exception\DependencyNotRegisterException;
 use Rehark\Carbon\http\method\HTTPMethods;
@@ -27,7 +28,12 @@ class ContainerTest extends TestCase
         $property->setAccessible(true);
         $dependencies = $property->getValue($container);
 
-        $expected = [];
+        $expected = [
+            'class' => [],
+            'interface' => [],
+            'instance' => []
+        ];
+
         $this->assertEquals($expected, $dependencies);
 
     }
@@ -44,7 +50,9 @@ class ContainerTest extends TestCase
         $dependencies = $property->getValue($container);
 
         $expected = [
-            'interface' => [Stringable::class => stdClass::class]
+            'class' => [],
+            'interface' => [Stringable::class => stdClass::class],
+            'instance' => []
         ];
 
         $this->assertEquals($expected, $dependencies);
@@ -57,11 +65,7 @@ class ContainerTest extends TestCase
         $container = Container::get();
         $reflection = new ReflectionObject($container);
 
-        $container->register(stdClass::class, stdClass::class);
-        $container->register(DateTime::class, DateTime::class);
         $container->register(WebUri::class, new WebUri('/'));
-        $container->register(WebRoute::class, WebRoute::class);
-        $container->register(Router::class, Router::class);
         $container->register('route_path', __DIR__);
 
         $property = $reflection->getProperty('dependencies');
@@ -76,11 +80,7 @@ class ContainerTest extends TestCase
                 'route_path' => __DIR__
             ],
             'class' => [
-                stdClass::class => stdClass::class,
-                DateTime::class => DateTime::class,
-                WebUri::class => new WebUri('/'),
-                WebRoute::class => WebRoute::class,
-                Router::class => Router::class
+                WebUri::class => new WebUri('/')
             ]
         ];
 
@@ -92,6 +92,7 @@ class ContainerTest extends TestCase
         $container = Container::get();
 
         $this->expectException(DependencyNotRegisterException::class);
+        
         $container->resolve(DateTimeInterface::class);
 
     }
@@ -155,11 +156,9 @@ class ContainerTest extends TestCase
 
         $container = Container::get();
 
-        $class = $container->resolve(WebRoute::class,[
-            HTTPMethods::class => HTTPMethods::GET
-        ]);
+        $class = $container->resolve(DefaultController::class);
 
-        $this->assertInstanceOf(WebRoute::class, $class);
+        $this->assertInstanceOf(DefaultController::class, $class);
 
     }
 
