@@ -3,7 +3,7 @@
 namespace Rehark\Carbon\dependency_injection;
 
 use ReflectionClass;
-use Rehark\Carbon\dependency_injection\exception\ClassOrInterfaceNotRegisterException;
+use Rehark\Carbon\dependency_injection\exception\DependencyNotRegisterException;
 
 /**
  * Class Container
@@ -70,7 +70,7 @@ class Container
      * @param string $key The key representing the dependency to resolve.
      * @param array $parameters Optional parameters for class instantiation.
      *
-     * @throws ClassOrInterfaceNotRegisterException If the dependency is not registered.
+     * @throws DependencyNotRegisterException If the dependency is not registered.
      *
      * @return mixed The resolved class instance or value.
      */
@@ -78,7 +78,7 @@ class Container
     {
 
         if (!$this->dependencyExist($key)) {
-            throw new ClassOrInterfaceNotRegisterException();
+            throw new DependencyNotRegisterException();
         }
 
         if ($this->instanceExist($key)) {

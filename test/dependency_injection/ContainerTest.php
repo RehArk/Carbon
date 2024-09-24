@@ -2,7 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use Rehark\Carbon\dependency_injection\Container;
-use Rehark\Carbon\dependency_injection\exception\ClassOrInterfaceNotRegisterException;
+use Rehark\Carbon\dependency_injection\exception\DependencyNotRegisterException;
 use Rehark\Carbon\http\method\HTTPMethods;
 use Rehark\Carbon\http\router\route\WebRoute;
 use Rehark\Carbon\http\router\Router;
@@ -91,7 +91,7 @@ class ContainerTest extends TestCase
 
         $container = Container::get();
 
-        $this->expectException(ClassOrInterfaceNotRegisterException::class);
+        $this->expectException(DependencyNotRegisterException::class);
         $container->resolve(DateTimeInterface::class);
 
     }
