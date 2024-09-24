@@ -92,11 +92,23 @@ class Container
             return $this->getValueOf($key);
         }
 
-        if ($this->defineType($key) == 'class') {
-            return $this->build($key, $parameters);
+        $_key = $key;
+
+        // if dependency already register, take the value of the kay
+        if ($this->dependencyRegistered($key)) {
+
+            $valueOfKey = $this->getValueOf($key);
+
+            // if many dependencies implementation, it need to be resoved
+            if(is_callable($valueOfKey)) {
+                $valueOfKey = call_user_func($valueOfKey, $parameters);
+            }
+
+            $_key = $valueOfKey;
+
         }
 
-        return $this->build($this->getValueOf($key), $parameters);
+        return $this->build($_key, $parameters);
     }
 
     /**
@@ -195,6 +207,19 @@ class Container
             return true;
         }
 
+        return array_key_exists($key, $this->dependencies[$type]);
+    }
+
+    /**
+     * Checks if a dependency is registered in the container.
+     *
+     * @param string $key The key representing the dependency.
+     *
+     * @return bool True if the dependency exists, false otherwise.
+     */
+    private function dependencyRegistered(string $key)
+    {
+        $type = $this->defineType($key);
         return array_key_exists($key, $this->dependencies[$type]);
     }
 

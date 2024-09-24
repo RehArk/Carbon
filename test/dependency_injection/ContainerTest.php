@@ -19,7 +19,8 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(Container::class, $container);
     }
 
-    public function testRegisterWithEmptyDependencies() {
+    public function testRegisterWithEmptyDependencies()
+    {
 
         $container = Container::get();
         $reflection = new ReflectionObject($container);
@@ -35,10 +36,10 @@ class ContainerTest extends TestCase
         ];
 
         $this->assertEquals($expected, $dependencies);
-
     }
 
-    public function testRegisterWithInterfaceDependencies() {
+    public function testRegisterWithInterfaceDependencies()
+    {
 
         $container = Container::get();
         $reflection = new ReflectionObject($container);
@@ -56,7 +57,6 @@ class ContainerTest extends TestCase
         ];
 
         $this->assertEquals($expected, $dependencies);
-
     }
 
     public function testRegisterWithClassDependencies()
@@ -87,35 +87,36 @@ class ContainerTest extends TestCase
         $this->assertEquals($expected, $dependencies);
     }
 
-    public function testResolveWithDependenciesFail() {
+    public function testResolveWithDependenciesFail()
+    {
 
         $container = Container::get();
 
         $this->expectException(DependencyNotRegisterException::class);
-        
-        $container->resolve(DateTimeInterface::class);
 
+        $container->resolve(DateTimeInterface::class);
     }
 
-    public function testResolveWithInterfaceDependencies() {
+    public function testResolveWithInterfaceDependencies()
+    {
 
         $container = Container::get();
 
         $class = $container->resolve(Stringable::class);
         $this->assertInstanceOf(stdClass::class, $class);
-
     }
 
-    public function testResolveWithNoParameter() {
+    public function testResolveWithNoParameter()
+    {
 
         $container = Container::get();
 
         $class = $container->resolve(stdClass::class);
         $this->assertInstanceOf(stdClass::class, $class);
-
     }
 
-    public function testResolveWithParameters() {
+    public function testResolveWithParameters()
+    {
 
         $container = Container::get();
 
@@ -130,39 +131,62 @@ class ContainerTest extends TestCase
         $this->assertEquals(new DateTime('today'), $date);
 
         $this->assertInstanceOf(WebRoute::class, $webRoute);
-
     }
 
-    public function testResolveWithStringDependency() {
+    public function testResolveWithStringDependency()
+    {
 
         $container = Container::get();
 
         $class = $container->resolve(Router::class);
         $this->assertInstanceOf(Router::class, $class);
-
     }
 
-    public function testResolveWithOptionalParameter() {
+    public function testResolveWithOptionalParameter()
+    {
 
         $container = Container::get();
 
         $class = $container->resolve(DateTime::class);
 
         $this->assertInstanceOf(DateTime::class, $class);
-
     }
 
-    public function testResolveWithRegisterDependencies() {
+    public function testResolveWithRegisterDependencies()
+    {
 
         $container = Container::get();
 
         $class = $container->resolve(DefaultController::class);
 
         $this->assertInstanceOf(DefaultController::class, $class);
+    }
+
+    public function testResolveWithRegisterManyDependenciesImplementation()
+    {
+
+        $container = Container::get();
+
+        $container->register(DateTimeInterface::class, function (array $data) {
+            
+            if ($data['type'] == 'immutable') {
+                return new DateTimeImmutable();
+            }
+
+            return new DateTime();
+
+        });
+
+        $dateImmutable = $container->resolve(DateTimeInterface::class, ['type' => 'immutable']);
+        $date = $container->resolve(DateTimeInterface::class, ['type' => '']);
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $dateImmutable);
+        $this->assertInstanceOf(DateTime::class, $date);
 
     }
 
-    public function testInstanceExiste() {
+    public function testInstanceExiste()
+    {
 
         $container = Container::get();
         $instanceExist = MethodsMocker::getMethod(Container::class, 'instanceExist');
@@ -171,7 +195,5 @@ class ContainerTest extends TestCase
 
         $this->assertEquals($instanceExist->invokeArgs($container, ['notExistingKey']), false);
         $this->assertEquals($instanceExist->invokeArgs($container, ['date']), true);
-
     }
-
 }
