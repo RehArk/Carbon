@@ -3,6 +3,8 @@
 namespace Rehark\Carbon;
 
 use Rehark\Carbon\dependency_injection\Container;
+use Rehark\Carbon\dependency_injection\MethodResolver;
+use Rehark\Carbon\dependency_injection\ObjectResolver;
 use Rehark\Carbon\http\response\AbstractResponse;
 use Rehark\Carbon\http\response\Response;
 use Rehark\Carbon\http\router\route\DefinitionRoute;
@@ -68,9 +70,11 @@ class DefaultKernel {
             return new Response(500, "No method found !");
         }
 
-        $container = Container::get();
-        $controllerInstance = $container->resolve($className, []);
-        $response = $container->resolveMethod($controllerInstance, $methodName);
+        $objectResolver = new ObjectResolver();
+        $controllerInstance = $objectResolver->resolve($className, []);
+
+        $methodeResolver = new MethodResolver();
+        $response = $methodeResolver->resolve($controllerInstance, $methodName);
 
         if($response) {
             return $response;

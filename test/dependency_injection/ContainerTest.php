@@ -87,42 +87,42 @@ class ContainerTest extends TestCase
         $this->assertEquals($expected, $dependencies);
     }
 
-    public function testResolveWithDependenciesFail()
+    public function testBuildWithDependenciesFail()
     {
 
         $container = Container::get();
 
         $this->expectException(DependencyNotRegisterException::class);
 
-        $container->resolve(DateTimeInterface::class);
+        $container->Build(DateTimeInterface::class);
     }
 
-    public function testResolveWithInterfaceDependencies()
+    public function testBuildWithInterfaceDependencies()
     {
 
         $container = Container::get();
 
-        $class = $container->resolve(Stringable::class);
+        $class = $container->build(Stringable::class);
         $this->assertInstanceOf(stdClass::class, $class);
     }
 
-    public function testResolveWithNoParameter()
+    public function testBuildWithNoParameter()
     {
 
         $container = Container::get();
 
-        $class = $container->resolve(stdClass::class);
+        $class = $container->build(stdClass::class);
         $this->assertInstanceOf(stdClass::class, $class);
     }
 
-    public function testResolveWithParameters()
+    public function testBuildWithParameters()
     {
 
         $container = Container::get();
 
-        $date = $container->resolve(DateTime::class, ['string' => 'today']);
+        $date = $container->build(DateTime::class, ['string' => 'today']);
 
-        $webRoute = $container->resolve(WebRoute::class, [
+        $webRoute = $container->build(WebRoute::class, [
             WebUri::class => new WebUri('/'),
             HTTPMethods::class => HTTPMethods::GET
         ]);
@@ -133,36 +133,36 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(WebRoute::class, $webRoute);
     }
 
-    public function testResolveWithStringDependency()
+    public function testBuildWithStringDependency()
     {
 
         $container = Container::get();
 
-        $class = $container->resolve(Router::class);
+        $class = $container->build(Router::class);
         $this->assertInstanceOf(Router::class, $class);
     }
 
-    public function testResolveWithOptionalParameter()
+    public function testBuildWithOptionalParameter()
     {
 
         $container = Container::get();
 
-        $class = $container->resolve(DateTime::class);
+        $class = $container->build(DateTime::class);
 
         $this->assertInstanceOf(DateTime::class, $class);
     }
 
-    public function testResolveWithRegisterDependencies()
+    public function testBuildWithRegisterDependencies()
     {
 
         $container = Container::get();
 
-        $class = $container->resolve(DefaultController::class);
+        $class = $container->build(DefaultController::class);
 
         $this->assertInstanceOf(DefaultController::class, $class);
     }
 
-    public function testResolveWithRegisterManyDependenciesImplementation()
+    public function testBuildWithRegisterManyDependenciesImplementation()
     {
 
         $container = Container::get();
@@ -177,8 +177,8 @@ class ContainerTest extends TestCase
 
         });
 
-        $dateImmutable = $container->resolve(DateTimeInterface::class, ['type' => 'immutable']);
-        $date = $container->resolve(DateTimeInterface::class, ['type' => '']);
+        $dateImmutable = $container->build(DateTimeInterface::class, ['type' => 'immutable']);
+        $date = $container->build(DateTimeInterface::class, ['type' => '']);
 
         $this->assertInstanceOf(DateTimeImmutable::class, $dateImmutable);
         $this->assertInstanceOf(DateTime::class, $date);

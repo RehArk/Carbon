@@ -3,16 +3,14 @@
 namespace Rehark\Carbon\dependency_injection;
 
 use ReflectionClass;
-use ReflectionMethod;
-use Rehark\Carbon\component\controller\AbstractController;
 use Rehark\Carbon\dependency_injection\exception\DependencyNotRegisterException;
 
 /**
- * Class Container
- *
- * This class represents a Dependency Injection (DI) container that handles the
- * registration and resolution of dependencies for classes and interfaces. 
- * It follows the Singleton design pattern to ensure a single instance of the container.
+ * Manages the registration and resolution of dependencies in a Dependency Injection (DI) system.
+ * 
+ * This class implements the Singleton pattern to ensure only one instance 
+ * of the container exists, handling various types of dependencies: classes, 
+ * interfaces, and instances.
  */
 class Container
 {
@@ -23,14 +21,13 @@ class Container
     private static Container $container;
 
     /**
-     * Gets the single instance of the Container.
+     * Retrieves the singleton instance of the Container.
      * If the instance does not exist, it creates one.
      *
      * @return Container The single instance of the container.
      */
     public static function get(): Container
     {
-
         if (!isset(self::$container)) {
             self::$container = new Container();
         }
@@ -39,17 +36,12 @@ class Container
     }
 
     /**
-     * @var array Holds all the registered dependencies.
-     * Dependencies are stored in a multi-dimensional array categorized by 
-     * their types: class, interface, or instance.
+     * @var array Holds all the registered dependencies, categorized by type: class, interface, or instance.
      */
     private array $dependencies = [];
 
     /**
-     * Constructor
-     * 
-     * The constructor is private to enforce the Singleton pattern, preventing
-     * direct instantiation of the class.
+     * Private constructor to enforce the Singleton pattern.
      */
     private function __construct()
     {
@@ -61,133 +53,92 @@ class Container
     }
 
     /**
-     * Registers a class, interface, or instance in the container.
+     * Registers a dependency (class, interface, or instance) in the container.
      *
-     * @param string $key The key representing the class, interface, or instance to register.
+     * @param string $key The key representing the dependency to register.
      * @param mixed $class The actual class or instance to associate with the key.
      */
-    public function register(string $key, $class): void
+    public function register(string $key, mixed $class): void
     {
         $type = $this->defineType($key);
         $this->dependencies[$type][$key] = $class;
     }
 
     /**
-     * Resolves the given dependency by its key, instantiating the class or
-     * returning the instance if already register.
+     * Resolves and returns an instance of the given dependency.
+     *
+     * If the dependency is already instantiated, it returns that instance; 
+     * otherwise, it creates a new instance using the DI container.
      *
      * @param string $key The key representing the dependency to resolve.
-     * @param array $parameters Optional parameters for class instantiation.
-     *
+     * @param array $args Optional parameters for class instantiation.
+     * 
      * @throws DependencyNotRegisterException If the dependency is not registered.
-     *
+     * 
      * @return mixed The resolved class instance or value.
      */
-    public function resolve(string $key, array $parameters = []): mixed
+    public function build(string $key, array $args = []): mixed
     {
-
-        if (!$this->isExistingDependdency($key)) {
-            throw new DependencyNotRegisterException();
-        }
-
         if ($this->isExistingInstance($key)) {
             return $this->getValueOf($key);
         }
 
-        $_key = $this->getDependencyClass($key, $parameters);
-        return $this->build($_key, $parameters);
-    }
-
-    /**
-     * Resolves method parameters using the container and calls the method on the controller instance.
-     *
-     * @param object $controllerInstance The controller instance.
-     * @param string $methodName The method name to be called.
-     * @param array $arg Additionnal arguments.
-     * @return mixed The result of the method call.
-     * @throws \ReflectionException If the method does not exist.
-     */
-    public function resolveMethod(AbstractController $controllerInstance, string $methodName, $args = []) : mixed {
-
-        $reflectionMethod = new ReflectionMethod($controllerInstance, $methodName);
-        $parameters = $reflectionMethod->getParameters();
-        $args = $this->resolveParameters($parameters, $args);
-
-        return $reflectionMethod->invokeArgs($controllerInstance, $args);
-
-    }
-
-    /**
-     * Builds and resolves the dependencies for a given class.
-     *
-     * This method uses reflection to inspect the constructor of the class and
-     * injects the required dependencies recursively.
-     *
-     * @param string $class The class to instantiate.
-     * @param array $parameters Optional parameters for dependency resolution.
-     *
-     * @return mixed A new instance of the class with dependencies injected.
-     */
-    public function build($class, $args): object
-    {
-
+        $class = $this->getDependencyClass($key, $args);
         $reflection = new ReflectionClass($class);
         $constructor = $reflection->getConstructor();
 
         if ($constructor === null) {
             return new $class();
         }
-        
-        $dependencies = [];
-        $parameters = $constructor->getParameters();
-        $dependencies = $this->resolveParameters($parameters, $args);
 
+        $dependencies = $this->resolveParameters($constructor->getParameters(), $args);
         return $reflection->newInstanceArgs($dependencies);
     }
 
-    public function resolveParameters(array $parameters, array $args) {
-
+    /**
+     * Resolves method parameters using the container.
+     *
+     * @param array $parameters The parameters of the method to resolve.
+     * @param array $args Additional arguments provided for resolution.
+     *
+     * @return array Resolved dependencies for the method parameters.
+     */
+    public function resolveParameters(array $parameters, array $args): array
+    {
         $dependencies = [];
 
-        foreach ($parameters as $key => $parameter) {
-
+        foreach ($parameters as $parameter) {
             $parameterType = $parameter->getType();
             $parameterName = $parameter->getName();
-
             $dependencyName = $parameterType->getName();
 
-            $type = $this->defineType($parameterName);
-
-            // if parameter is in parameters, add as dependency
-            if (array_key_exists($dependencyName, $args)) {
+            // If parameter is in args, add as dependency
+            if (isset($args[$dependencyName])) {
                 $dependencies[] = $args[$dependencyName];
                 continue;
             }
 
-            // if parameter is string, try to resolve by name
-            if ($dependencyName == 'string' && $type == 'instance') {
-                $dependencies[] = $this->resolve($parameterName);
+            // If parameter is string, try to resolve by name
+            if ($dependencyName == 'string' && $this->defineType($parameterName) == 'instance') {
+                $dependencies[] = $this->build($parameterName);
                 continue;
             }
 
-            // if parameter is optionnal, set default value
+            // If parameter is optional, set default value
             if ($parameter->isOptional()) {
                 $dependencies[] = $parameter->getDefaultValue();
                 continue;
             }
 
-            // else try to resolve
-            $dependencies[] = $this->resolve($dependencyName);
+            // Else try to resolve the dependency
+            $dependencies[] = $this->build($dependencyName);
         }
 
         return $dependencies;
-
     }
 
     /**
      * Determines the type of the dependency based on the key.
-     * Returns 'class' if the key is a class, 'interface' if it's an interface,
-     * and 'instance' if it's a specific instance.
      *
      * @param string $key The key representing the dependency.
      *
@@ -195,7 +146,6 @@ class Container
      */
     private function defineType(string $key): string
     {
-
         if (class_exists($key)) {
             return 'class';
         }
@@ -214,17 +164,12 @@ class Container
      *
      * @return bool True if the dependency exists, false otherwise.
      */
-    private function isExistingDependdency(string $key): bool
+    private function isDependencyRegistered(string $key): bool
     {
         $type = $this->defineType($key);
-
-        // If it's a class, it will implicitly be a dependency.
-        if ($type == 'class') {
-            return true;
-        }
-
-        return array_key_exists($key, $this->dependencies[$type]);
+        return isset($this->dependencies[$type][$key]);
     }
+
 
     /**
      * Checks if a dependency is registered in the container.
@@ -233,10 +178,10 @@ class Container
      *
      * @return bool True if the dependency exists, false otherwise.
      */
-    private function isDependencyRegistered(string $key): bool
+    private function isExistingDependdency(string $key): bool
     {
         $type = $this->defineType($key);
-        return array_key_exists($key, $this->dependencies[$type]);
+        return $type === 'class' || isset($this->dependencies[$type][$key]);
     }
 
     /**
@@ -248,47 +193,38 @@ class Container
      */
     private function isExistingInstance(string $key): bool
     {
-
-        if (!$this->isExistingDependdency($key)) {
-            return false;
-        }
-
-        if (
-            !class_exists($key) &&
-            !interface_exists($key)
-        ) {
-            return true;
-        }
-
-        return false;
+        return isset($this->dependencies['instance'][$key]);
     }
 
     /**
-     * Get the dependency class by checking if it's registered, resolving it if necessary.
+     * Gets the dependency class by checking if it's registered, resolving it if necessary.
      *
      * @param string $key The key of the dependency.
-     * @param array $parameters Parameters to be passed if the dependency is a callable.
+     * @param array $args Parameters to be passed if the dependency is a callable.
+     *
      * @return mixed The resolved dependency class or the original value.
+     *
+     * @throws DependencyNotRegisterException If the dependency is not registered.
      */
-    protected function getDependencyClass($key, $parameters = [])
+    private function getDependencyClass(string $key, array $args = []): mixed
     {
-        // Check if dependency is registered
-        if ($this->isDependencyRegistered($key)) {
-
-            // Get the value associated with the key
-            $valueOfKey = $this->getValueOf($key);
-
-            // If the value is callable, resolve it by passing the parameters
-            if (is_callable($valueOfKey)) {
-                return call_user_func($valueOfKey, $parameters);
-            }
-
-            // Return the resolved value
-            return $valueOfKey;
+        if (!$this->isExistingDependdency($key)) {
+            throw new DependencyNotRegisterException();
         }
 
-        // Return null or handle the case when the dependency is not registered
-        return $key;
+        if (!$this->isDependencyRegistered($key)) {
+            return $key;
+        }
+
+        $value = $this->getValueOf($key);
+
+        // If the value is a function to build object depending on params
+        if (is_callable($value)) {
+            return call_user_func($value, $args);
+        }
+
+        // Return the resolved value
+        return $value;
     }
 
     /**
