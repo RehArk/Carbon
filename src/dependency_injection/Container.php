@@ -3,6 +3,8 @@
 namespace Rehark\Carbon\dependency_injection;
 
 use ReflectionClass;
+use ReflectionMethod;
+use Rehark\Carbon\component\controller\AbstractController;
 use Rehark\Carbon\dependency_injection\exception\DependencyNotRegisterException;
 
 /**
@@ -97,6 +99,25 @@ class Container
     }
 
     /**
+     * Resolves method parameters using the container and calls the method on the controller instance.
+     *
+     * @param object $controllerInstance The controller instance.
+     * @param string $methodName The method name to be called.
+     * @param array $arg Additionnal arguments.
+     * @return mixed The result of the method call.
+     * @throws \ReflectionException If the method does not exist.
+     */
+    public function resolveMethod(AbstractController $controllerInstance, string $methodName, $args = []) : mixed {
+
+        $reflectionMethod = new ReflectionMethod($controllerInstance, $methodName);
+        $parameters = $reflectionMethod->getParameters();
+        $args = $this->resolveParameters($parameters, $args);
+
+        return $reflectionMethod->invokeArgs($controllerInstance, $args);
+
+    }
+
+    /**
      * Builds and resolves the dependencies for a given class.
      *
      * This method uses reflection to inspect the constructor of the class and
@@ -107,7 +128,7 @@ class Container
      *
      * @return mixed A new instance of the class with dependencies injected.
      */
-    public function build($class, $parameters): object
+    public function build($class, $args): object
     {
 
         $reflection = new ReflectionClass($class);
@@ -116,10 +137,19 @@ class Container
         if ($constructor === null) {
             return new $class();
         }
+        
+        $dependencies = [];
+        $parameters = $constructor->getParameters();
+        $dependencies = $this->resolveParameters($parameters, $args);
+
+        return $reflection->newInstanceArgs($dependencies);
+    }
+
+    public function resolveParameters(array $parameters, array $args) {
 
         $dependencies = [];
 
-        foreach ($constructor->getParameters() as $key => $parameter) {
+        foreach ($parameters as $key => $parameter) {
 
             $parameterType = $parameter->getType();
             $parameterName = $parameter->getName();
@@ -129,8 +159,8 @@ class Container
             $type = $this->defineType($parameterName);
 
             // if parameter is in parameters, add as dependency
-            if (array_key_exists($dependencyName, $parameters)) {
-                $dependencies[] = $parameters[$dependencyName];
+            if (array_key_exists($dependencyName, $args)) {
+                $dependencies[] = $args[$dependencyName];
                 continue;
             }
 
@@ -150,7 +180,8 @@ class Container
             $dependencies[] = $this->resolve($dependencyName);
         }
 
-        return $reflection->newInstanceArgs($dependencies);
+        return $dependencies;
+
     }
 
     /**

@@ -70,8 +70,7 @@ class DefaultKernel {
 
         $container = Container::get();
         $controllerInstance = $container->resolve($className, []);
-                
-        $response = $controllerInstance->$methodName();
+        $response = $container->resolveMethod($controllerInstance, $methodName);
 
         if($response) {
             return $response;
