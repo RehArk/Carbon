@@ -2,7 +2,6 @@
 
 namespace Rehark\Carbon;
 
-use Rehark\Carbon\dependency_injection\Container;
 use Rehark\Carbon\dependency_injection\MethodResolver;
 use Rehark\Carbon\dependency_injection\ObjectResolver;
 use Rehark\Carbon\http\response\AbstractResponse;
