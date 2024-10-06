@@ -64,7 +64,7 @@ class Container
      * @param string $key The key representing the class, interface, or instance to register.
      * @param mixed $class The actual class or instance to associate with the key.
      */
-    public function register(string $key, $class)
+    public function register(string $key, $class): void
     {
         $type = $this->defineType($key);
         $this->dependencies[$type][$key] = $class;
@@ -81,33 +81,18 @@ class Container
      *
      * @return mixed The resolved class instance or value.
      */
-    public function resolve(string $key, array $parameters = [])
+    public function resolve(string $key, array $parameters = []): mixed
     {
 
-        if (!$this->dependencyExist($key)) {
+        if (!$this->isExistingDependdency($key)) {
             throw new DependencyNotRegisterException();
         }
 
-        if ($this->instanceExist($key)) {
+        if ($this->isExistingInstance($key)) {
             return $this->getValueOf($key);
         }
 
-        $_key = $key;
-
-        // if dependency already register, take the value of the kay
-        if ($this->dependencyRegistered($key)) {
-
-            $valueOfKey = $this->getValueOf($key);
-
-            // if many dependencies implementation, it need to be resoved
-            if(is_callable($valueOfKey)) {
-                $valueOfKey = call_user_func($valueOfKey, $parameters);
-            }
-
-            $_key = $valueOfKey;
-
-        }
-
+        $_key = $this->getDependencyClass($key, $parameters);
         return $this->build($_key, $parameters);
     }
 
@@ -122,7 +107,7 @@ class Container
      *
      * @return mixed A new instance of the class with dependencies injected.
      */
-    public function build($class, $parameters)
+    public function build($class, $parameters): object
     {
 
         $reflection = new ReflectionClass($class);
@@ -198,7 +183,7 @@ class Container
      *
      * @return bool True if the dependency exists, false otherwise.
      */
-    private function dependencyExist(string $key)
+    private function isExistingDependdency(string $key): bool
     {
         $type = $this->defineType($key);
 
@@ -217,7 +202,7 @@ class Container
      *
      * @return bool True if the dependency exists, false otherwise.
      */
-    private function dependencyRegistered(string $key)
+    private function isDependencyRegistered(string $key): bool
     {
         $type = $this->defineType($key);
         return array_key_exists($key, $this->dependencies[$type]);
@@ -230,10 +215,10 @@ class Container
      *
      * @return bool True if the dependency is an instance, false otherwise.
      */
-    private function instanceExist(string $key)
+    private function isExistingInstance(string $key): bool
     {
 
-        if (!$this->dependencyExist($key)) {
+        if (!$this->isExistingDependdency($key)) {
             return false;
         }
 
@@ -248,13 +233,41 @@ class Container
     }
 
     /**
+     * Get the dependency class by checking if it's registered, resolving it if necessary.
+     *
+     * @param string $key The key of the dependency.
+     * @param array $parameters Parameters to be passed if the dependency is a callable.
+     * @return mixed The resolved dependency class or the original value.
+     */
+    protected function getDependencyClass($key, $parameters = [])
+    {
+        // Check if dependency is registered
+        if ($this->isDependencyRegistered($key)) {
+
+            // Get the value associated with the key
+            $valueOfKey = $this->getValueOf($key);
+
+            // If the value is callable, resolve it by passing the parameters
+            if (is_callable($valueOfKey)) {
+                return call_user_func($valueOfKey, $parameters);
+            }
+
+            // Return the resolved value
+            return $valueOfKey;
+        }
+
+        // Return null or handle the case when the dependency is not registered
+        return $key;
+    }
+
+    /**
      * Retrieves the value of a registered dependency by its key.
      *
      * @param string $key The key representing the dependency.
      *
      * @return mixed The registered class, interface, or instance.
      */
-    private function getValueOf(string $key)
+    private function getValueOf(string $key): mixed
     {
         $type = $this->defineType($key);
         return $this->dependencies[$type][$key];

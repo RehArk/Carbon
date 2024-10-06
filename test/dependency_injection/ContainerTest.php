@@ -185,15 +185,16 @@ class ContainerTest extends TestCase
 
     }
 
-    public function testInstanceExiste()
+    public function testIsExistingDependdency()
     {
 
         $container = Container::get();
-        $instanceExist = MethodsMocker::getMethod(Container::class, 'instanceExist');
+        $instanceExist = MethodsMocker::getMethod(Container::class, 'isExistingInstance');
 
         $container->register('date', new DateTime('today'));
 
         $this->assertEquals($instanceExist->invokeArgs($container, ['notExistingKey']), false);
         $this->assertEquals($instanceExist->invokeArgs($container, ['date']), true);
     }
+
 }
