@@ -2,7 +2,6 @@
 
 namespace Rehark\Carbon\http\response;
 
-use Rehark\Carbon\http\response\exception\InvalidResponseException;
 use Rehark\Carbon\http\response\exception\NonExistentFileException;
 use Rehark\Carbon\http\response\http_code\HttpCode;
 

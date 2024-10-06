@@ -2,6 +2,8 @@
 
 namespace Rehark\Carbon;
 
+use Rehark\Carbon\dependency_injection\MethodResolver;
+use Rehark\Carbon\dependency_injection\ObjectResolver;
 use Rehark\Carbon\http\response\AbstractResponse;
 use Rehark\Carbon\http\response\Response;
 use Rehark\Carbon\http\router\route\DefinitionRoute;
@@ -9,19 +11,15 @@ use Rehark\Carbon\http\router\Router;
 
 class DefaultKernel {
 
-    private string $root;
     public Router $router;
 
-    public function __construct(string $root) {
-        $this->root = $root;
-        $this->initRouter();
+    public function __construct(Router $router) {
+
+        $this->router = $router;
+        
         $matching_route = $this->start();
         $server_resposne = $this->buildResponse($matching_route);
         $server_resposne->send();
-    }
-
-    private function initRouter() : void {
-        $this->router = new Router($this->root);
     }
 
     private function start() : ?DefinitionRoute {
@@ -71,8 +69,11 @@ class DefaultKernel {
             return new Response(500, "No method found !");
         }
 
-        $controllerInstance = new $className();
-        $response = $controllerInstance->$methodName();
+        $objectResolver = new ObjectResolver();
+        $controllerInstance = $objectResolver->resolve($className, []);
+
+        $methodeResolver = new MethodResolver();
+        $response = $methodeResolver->resolve($controllerInstance, $methodName);
 
         if($response) {
             return $response;
